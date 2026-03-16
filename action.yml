@@ -1,0 +1,28 @@
+name: 'AI Pull Request Describer'
+description: 'Automatically generate descriptions for pull requests using any OpenAI-compatible AI model'
+branding:
+  icon: 'cpu'
+  color: 'purple'
+
+inputs:
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+  github-api-base-url:
+    description: 'GitHub API Base URL'
+    default: 'https://api.github.com'
+    required: false
+  openai-api-key:
+    description: 'OpenAI API key for fetching AI suggestions'
+    required: true
+  openai-model:
+    description: 'The OpenAI model to use'
+    default: 'gpt-3.5-turbo'
+    required: false
+  openai-base-url:
+    description: 'OpenAI API Base URL'
+    required: false
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
