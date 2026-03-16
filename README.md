@@ -39,11 +39,11 @@ jobs:
       - name: AI Pull Request Describer
         uses: fajarhide/ai-pr-describer@main
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          github-api-base-url: 'https://api.github.com' 
-          openai-api-key: ${{ secrets.AI_API_KEY }}
-          openai-model: 'gpt-4o' # or 'deepseek-chat', etc.
-          openai-base-url: 'https://api.deepseek.com' # Optional: for other providers
+          github-token: ${{ secrets.GH_TOKEN }}
+          github-api-base-url: 'https://api.github.com'
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          openai-model: ${{ secrets.OPENAI_MODEL }}
+          openai-base-url: ${{ secrets.OPENAI_BASE_URL }}
 ```
 
 ## AI Provider Examples 💡

@@ -13,11 +13,11 @@ import (
 )
 
 func main() {
-	githubToken := os.Getenv("INPUT_GITHUB-TOKEN")
-	githubAPIBaseURL := os.Getenv("INPUT_GITHUB-API-BASE-URL")
-	openaiAPIKey := os.Getenv("INPUT_OPENAI-API-KEY")
-	openaiModel := os.Getenv("INPUT_OPENAI-MODEL")
-	openaiBaseURL := os.Getenv("INPUT_OPENAI-BASE-URL")
+	githubToken := getEnv("INPUT_GITHUB_TOKEN", "INPUT_GITHUB-TOKEN", "GH_TOKEN")
+	githubAPIBaseURL := getEnv("INPUT_GITHUB_API_BASE_URL", "INPUT_GITHUB-API-BASE-URL", "GH_API_BASE_URL")
+	openaiAPIKey := getEnv("INPUT_OPENAI_API_KEY", "INPUT_OPENAI-API-KEY", "OPENAI_API_KEY")
+	openaiModel := getEnv("INPUT_OPENAI_MODEL", "INPUT_OPENAI-MODEL", "OPENAI_MODEL")
+	openaiBaseURL := getEnv("INPUT_OPENAI_BASE_URL", "INPUT_OPENAI-BASE-URL", "OPENAI_BASE_URL")
 	repoFullName := os.Getenv("GITHUB_REPOSITORY")
 	eventPath := os.Getenv("GITHUB_EVENT_PATH")
 
@@ -196,4 +196,13 @@ func postComment(ctx context.Context, client *github.Client, owner, repo string,
 	} else {
 		fmt.Printf("::info::Successfully posted comment to PR #%d.\n", prNumber)
 	}
+}
+
+func getEnv(keys ...string) string {
+	for _, key := range keys {
+		if val := os.Getenv(key); val != "" {
+			return val
+		}
+	}
+	return ""
 }
