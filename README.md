@@ -1,7 +1,7 @@
 # AI Pull Request Describer 🤖
 Automatically generate descriptions for pull requests using any OpenAI-compatible AI model (ChatGPT, DeepSeek, Groq, Ollama, etc.).
 
-When you open or update a pull request labeled with **"ai-describer"**, this action will automatically generate a concise list of changes and update the pull request description (body) or post a comment.
+When you open or update a pull request labeled with **"ai-describe"**, this action will automatically generate a concise list of changes and update the pull request description (body) or post a comment.
 
 ## Features ✨
 - **Multi-Model Support**: Works with OpenAI, DeepSeek, Groq, or any OpenAI-compatible API.
