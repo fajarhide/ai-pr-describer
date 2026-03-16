@@ -15,8 +15,8 @@ FROM alpine:latest
 
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /root/
+WORKDIR /app
 
-COPY --from=builder /app/ai-pr-describer .
+COPY --from=builder /app/ai-pr-describer /usr/local/bin/ai-pr-describer
 
-ENTRYPOINT ["./ai-pr-describer"]
+ENTRYPOINT ["ai-pr-describer"]
