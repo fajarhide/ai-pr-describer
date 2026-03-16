@@ -1,4 +1,4 @@
-# AI Pull Request Describer 🤖
+# AI Pull Request Describer
 Automatically generate descriptions for pull requests using any OpenAI-compatible AI model (ChatGPT, DeepSeek, Groq, Ollama, etc.).
 
 When you open or update a pull request labeled with **"ai-describe"**, this action will automatically generate a concise list of changes and update the pull request description (body) or post a comment.
@@ -7,7 +7,7 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 
 ![AI PR Describer Demo](media/ai-pr-describer.gif)
 
-## Features ✨
+## Features
 - **Multi-Model Support**: Works with OpenAI, DeepSeek, Groq, or any OpenAI-compatible API.
 - **Auto-Update PR Body**: Automatically updates the PR description for a cleaner workflow.
 - **Customizable Prompt**: Generates categorized summaries (Refactor, Bug Fix, etc.).
@@ -17,7 +17,7 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 * GitHub API token for API access.
 * API key from your chosen AI provider (OpenAI, DeepSeek, etc.).
 
-## Usage 🚀
+## Usage
 
 Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
 
@@ -50,7 +50,7 @@ jobs:
           openai-base-url: ${{ secrets.OPENAI_BASE_URL }}
 ```
 
-## AI Provider Examples 💡
+## AI Provider Examples
 
 ### OpenAI (Default)
 ```yaml
@@ -78,7 +78,7 @@ openai-model: 'llama3'
 openai-base-url: 'http://your-ollama-host:11434/v1'
 ```
 
-## Configuration ⚙️
+## Configuration
 
 | Input                  | Required | Description                                                                 |
 |------------------------|----------|-----------------------------------------------------------------------------|
@@ -91,13 +91,13 @@ openai-base-url: 'http://your-ollama-host:11434/v1'
 ### Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
-## Contributing 🤝
+## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 ## Credits
 
 -   [Fajar Hidayat](https://github.com/fajarhide)
 -   [All Contributors](../../contributors)
-## License 📄
+## License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
