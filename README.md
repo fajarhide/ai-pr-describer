@@ -3,6 +3,10 @@ Automatically generate descriptions for pull requests using any OpenAI-compatibl
 
 When you open or update a pull request labeled with **"ai-describe"**, this action will automatically generate a concise list of changes and update the pull request description (body) or post a comment.
 
+## Demo / Review 🎬
+
+![AI PR Describer Demo](media/ai-pr-describer.gif)
+
 ## Features ✨
 - **Multi-Model Support**: Works with OpenAI, DeepSeek, Groq, or any OpenAI-compatible API.
 - **Auto-Update PR Body**: Automatically updates the PR description for a cleaner workflow.
