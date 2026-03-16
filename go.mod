@@ -1,6 +1,6 @@
 module github.com/fajarhide/ai-pr-describer
 
-go 1.22.0
+go 1.25.0
 
 require (
 	github.com/google/go-github/v60 v60.0.0
