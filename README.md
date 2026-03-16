@@ -55,14 +55,14 @@ openai-model: 'gpt-4o'
 
 ### DeepSeek
 ```yaml
-openai-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
+openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 openai-model: 'deepseek-chat'
 openai-base-url: 'https://api.deepseek.com'
 ```
 
 ### Groq
 ```yaml
-openai-api-key: ${{ secrets.GROQ_API_KEY }}
+openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 openai-model: 'llama3-8b-8192'
 openai-base-url: 'https://api.groq.com/openai/v1'
 ```
