@@ -3,7 +3,7 @@ Automatically generate descriptions for pull requests using any OpenAI-compatibl
 
 When you open or update a pull request labeled with **"ai-describe"**, this action will automatically generate a concise list of changes and update the pull request description (body) or post a comment.
 
-## Demo / Review 🎬
+## Demo / Review
 
 ![AI PR Describer Demo](media/ai-pr-describer.gif)
 
@@ -19,7 +19,9 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 
 ## Usage
 
-Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
+### 1. Add label "ai-describe" to your pull request
+
+### 2. Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
 
 ```yaml
 name: AI Pull Request Describer
