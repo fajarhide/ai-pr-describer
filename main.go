@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	githubToken := os.Getenv("INPUT_GITHUB_TOKEN")
+	githubToken := os.Getenv("INPUT_GITHUB-TOKEN")
 	githubAPIBaseURL := os.Getenv("INPUT_GITHUB-API-BASE-URL")
 	openaiAPIKey := os.Getenv("INPUT_OPENAI-API-KEY")
 	openaiModel := os.Getenv("INPUT_OPENAI-MODEL")
