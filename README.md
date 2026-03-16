@@ -19,9 +19,9 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 
 ## Usage
 
-### 1. Add label "ai-describe" to your pull request
+* 1. Add label "ai-describe" to your pull request
 
-### 2. Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
+* 2. Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
 
 ```yaml
 name: AI Pull Request Describer
