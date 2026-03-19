@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	githubToken := getEnv("INPUT_GITHUB_TOKEN", "INPUT_GITHUB-TOKEN", "GH_TOKEN")
+	githubToken := getEnv("INPUT_GITHUB_TOKEN", "INPUT_GITHUB-TOKEN", "GH_TOKEN", "GITHUB_TOKEN")
 	githubAPIBaseURL := getEnv("INPUT_GITHUB_API_BASE_URL", "INPUT_GITHUB-API-BASE-URL", "GH_API_BASE_URL")
 	openaiAPIKey := getEnv("INPUT_OPENAI_API_KEY", "INPUT_OPENAI-API-KEY", "OPENAI_API_KEY")
 	openaiModel := getEnv("INPUT_OPENAI_MODEL", "INPUT_OPENAI-MODEL", "OPENAI_MODEL")
@@ -25,8 +25,22 @@ func main() {
 		openaiModel = openai.GPT3Dot5Turbo
 	}
 
-	if githubToken == "" || openaiAPIKey == "" || repoFullName == "" || eventPath == "" {
-		fmt.Println("::error::Missing required environment variables")
+	var missingVars []string
+	if githubToken == "" {
+		missingVars = append(missingVars, "github-token")
+	}
+	if openaiAPIKey == "" {
+		missingVars = append(missingVars, "openai-api-key")
+	}
+	if repoFullName == "" {
+		missingVars = append(missingVars, "GITHUB_REPOSITORY")
+	}
+	if eventPath == "" {
+		missingVars = append(missingVars, "GITHUB_EVENT_PATH")
+	}
+
+	if len(missingVars) > 0 {
+		fmt.Printf("::error::Missing required environment variables: %s\n", strings.Join(missingVars, ", "))
 		os.Exit(1)
 	}
 

@@ -45,7 +45,7 @@ jobs:
       - name: AI Pull Request Describer
         uses: fajarhide/ai-pr-describer@main
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           github-api-base-url: 'https://api.github.com'
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           openai-model: ${{ secrets.OPENAI_MODEL }}
@@ -82,13 +82,29 @@ openai-base-url: 'http://your-ollama-host:11434/v1'
 
 ## Configuration
 
-| Input                  | Required | Description                                                                 |
-|------------------------|----------|-----------------------------------------------------------------------------|
-| `github-token`         | Yes      | The GitHub API token for accessing the repository.                         |
-| `openai-api-key`       | Yes      | The API key for your AI provider.                                   |
+| `github-token`         | Yes      | The GitHub API token (`${{ secrets.GITHUB_TOKEN }}`).                         |
+| `openai-api-key`       | Yes      | The API key for your AI provider (e.g., OpenAI, DeepSeek).                                   |
 | `openai-model`         | No       | The AI model to use. Defaults to `gpt-3.5-turbo`.                        |
 | `openai-base-url`      | No       | Custom base URL for OpenAI-compatible APIs.                                |
 | `github-api-base-url`  | No       | The base URL for the GitHub API. Defaults to `https://api.github.com`.      |
+
+## Troubleshooting 💡
+
+### "Missing required environment variables"
+This error occurs when the required secrets are not passed to the action. Ensure you have:
+1. Created a secret named `OPENAI_API_KEY` in your repository settings (**Settings > Secrets and variables > Actions**).
+2. Passed the secrets in your workflow file as shown in the [Usage](#usage) section.
+
+> [!NOTE]
+> You **do not** need to create `GITHUB_TOKEN` yourself. It is a built-in secret provided automatically by GitHub Actions. You only need to create custom secrets like `OPENAI_API_KEY`.
+
+
+### Pull Requests from Forks
+By default, GitHub does not pass secrets to workflows triggered by pull requests from forked repositories for security reasons. If a contributor from a fork opens a PR, the action will fail with a "Missing required environment variables" error because it cannot access your `OPENAI_API_KEY`.
+
+To fix this, you can:
+- Manually run the action on the PR after it's been opened by a maintainer.
+- (Use with caution) Use the `pull_request_target` event instead of `pull_request`, but be aware of the security implications.
 
 ### Changelog
 
