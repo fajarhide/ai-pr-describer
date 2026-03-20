@@ -13,8 +13,7 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 - **Customizable Prompt**: Generates categorized summaries (Refactor, Bug Fix, etc.).
 - **Go-Powered**: Fast, efficient, and lightweight container-based action.
 
-## Requirements 🛠️
-* GitHub API token for API access.
+## Requirements
 * API key from your chosen AI provider (OpenAI, DeepSeek, etc.).
 
 ## Usage
@@ -27,7 +26,7 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 name: AI Pull Request Describer
 
 on:
-  pull_request:
+  pull_request_targed:
     types: [reopened, labeled]
 
 jobs:
@@ -96,7 +95,7 @@ This error occurs when the required secrets are not passed to the action. Ensure
 2. Passed the secrets in your workflow file as shown in the [Usage](#usage) section.
 
 > [!NOTE]
-> You **do not** need to create `GITHUB_TOKEN` yourself. It is a built-in secret provided automatically by GitHub Actions. You only need to create custom secrets like `OPENAI_API_KEY`.
+> You **do not** need to create `GITHUB_TOKEN` yourself. It is a built-in secret provided automatically by GitHub Actions. You only need to create custom secrets like `OPENAI_API_KEY` etc.
 
 
 ### Pull Requests from Forks
