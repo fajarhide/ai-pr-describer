@@ -51,13 +51,20 @@ runs:
       shell: bash
       run: |
         VERSION=${{ github.action_ref || github.ref_name }}
-        if [ "$VERSION" == "main" ] || [ "$VERSION" == "master" ]; then
-          # Fallback to latest release if on main
-          URL=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | grep "browser_download_url.*${{ steps.binary.outputs.filename }}" | cut -d '"' -f 4)
+        # If running from a branch or if action_ref is empty, try to get latest release
+        if [ -z "$VERSION" ] || [ "$VERSION" == "main" ] || [ "$VERSION" == "master" ]; then
+          echo "Determining latest version for fajarhide/ai-pr-describer..."
+          URL=$(curl -s https://api.github.com/repos/fajarhide/ai-pr-describer/releases/latest | grep "browser_download_url.*${{ steps.binary.outputs.filename }}" | cut -d '"' -f 4)
         else
-          URL="https://github.com/${{ github.repository }}/releases/download/$VERSION/${{ steps.binary.outputs.filename }}"
+          URL="https://github.com/fajarhide/ai-pr-describer/releases/download/$VERSION/${{ steps.binary.outputs.filename }}"
         fi
         
+        if [ -z "$URL" ]; then
+          echo "::error::Could not find binary for version '$VERSION' and platform '${{ steps.binary.outputs.filename }}'."
+          echo "::error::Ensure a release has been created and the tag exists."
+          exit 1
+        fi
+
         echo "Downloading $URL"
         curl -L -o /tmp/ai-pr-describer "$URL"
         chmod +x /tmp/ai-pr-describer
