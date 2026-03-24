@@ -74,6 +74,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	fmt.Printf("::debug::PR Number: %d\n", prNumber)
+
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: githubToken},
@@ -95,6 +97,7 @@ func main() {
 	aiClient := openai.NewClientWithConfig(config)
 
 	// Check for label
+	fmt.Printf("::debug::Fetching PR details...\n")
 	pr, _, err := ghClient.PullRequests.Get(ctx, owner, repo, prNumber)
 	if err != nil {
 		fmt.Printf("::error::Error fetching PR: %v\n", err)
@@ -115,6 +118,7 @@ func main() {
 	}
 
 	// Fetch changes
+	fmt.Printf("::debug::Fetching PR files...\n")
 	files, _, err := ghClient.PullRequests.ListFiles(ctx, owner, repo, prNumber, nil)
 	if err != nil {
 		fmt.Printf("::error::Error fetching PR files: %v\n", err)
@@ -138,7 +142,10 @@ func main() {
 		changes.WriteString(fileDiff)
 	}
 
+	fmt.Printf("::debug::Diff size: %d characters\n", changes.Len())
+
 	// Fetch suggestions
+	fmt.Printf("::debug::Requesting AI suggestions (model: %s, max_tokens: %d)...\n", openaiModel, maxTokens)
 	suggestions, err := fetchAiSuggestions(ctx, aiClient, changes.String(), openaiModel, maxTokens)
 	if err != nil {
 		fmt.Printf("::error::Error fetching AI suggestions: %v\n", err)
@@ -208,25 +215,21 @@ func fetchAiSuggestions(ctx context.Context, client *openai.Client, prChanges st
 }
 
 func generatePrompt(prChanges string) string {
-	var prompt strings.Builder
-	prompt.WriteString("We've made several updates in this pull request and would like to generate a list of changes. ")
-	prompt.WriteString("The purpose is to summarize the pull request for easy understanding. ")
-	prompt.WriteString("We are not interested in code reviews at this time.\n\n")
+	return fmt.Sprintf(`I have a pull request with the following changes. Please provide a concise summary of these changes, categorized by type (e.g., Refactor, Bug Fix, Optimization, Feature).
 
-	prompt.WriteString("Below are the changes in this pull request:\n")
-	prompt.WriteString("```\n")
-	prompt.WriteString(prChanges)
-	prompt.WriteString("```\n\n")
+### Changes Breakdown
+%[1]s
 
-	prompt.WriteString("Please generate a concise list of changes, categorizing each by its type (e.g., 'Refactor', 'Bug Fix', 'Optimization').\n\n")
+---
+Structure your response as follows:
+[A high-level overview of the overall changes]
 
-	prompt.WriteString("Structure your list of changes like this:\n")
-	prompt.WriteString("[Short description of the whole changes]\n\n")
-	prompt.WriteString("1. **Type**: Refactor\n   **Description**: [Short description of the change]\n")
-	prompt.WriteString("2. **Type**: Optimization\n   **Description**: [Short description of the change]\n")
-	prompt.WriteString("...")
-
-	return prompt.String()
+### 📋 Detailed Changes
+1. **Type**: [Type]
+   **Description**: [Short, clear description of the change]
+2. **Type**: [Type]
+   **Description**: [Short, clear description of the change]
+...`, prChanges)
 }
 
 func postComment(ctx context.Context, client *github.Client, owner, repo string, prNumber int, suggestions string) {
