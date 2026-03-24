@@ -28,7 +28,7 @@ inputs:
     required: false
   max-context-tokens:
     description: 'The maximum number of tokens for the entire context (prompt + response)'
-    default: '256000'
+    default: '32000'
     required: false
 
 runs:

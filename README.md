@@ -94,7 +94,7 @@ openai-base-url: 'http://your-ollama-host:11434/v1'
 | `openai-model`         | No       | The AI model to use. Defaults to `gpt-3.5-turbo`.                            |
 | `openai-base-url`      | No       | Custom base URL for OpenAI-compatible APIs.                                   |
 | `max-tokens`           | No       | The maximum length of the generated PR description. Defaults to `2000`.      |
-| `max-context-tokens`   | No       | The maximum tokens for the input diff + prompt. Defaults to `256000`.         |
+| `max-context-tokens`   | No       | The maximum tokens for the input diff + prompt. Defaults to `32000`.          |
 
 ## 🚀 Performance
 

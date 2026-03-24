@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/v60/github"
 	"github.com/sashabaranov/go-openai"
@@ -31,7 +32,7 @@ func main() {
 		}
 	}
 
-	maxContextTokens := 256000
+	maxContextTokens := 32000
 	if maxContextTokensStr != "" {
 		if val, err := strconv.Atoi(maxContextTokensStr); err == nil {
 			maxContextTokens = val
@@ -76,7 +77,8 @@ func main() {
 
 	fmt.Printf("::debug::PR Number: %d\n", prNumber)
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: githubToken},
 	)
@@ -145,6 +147,7 @@ func main() {
 	fmt.Printf("::debug::Diff size: %d characters\n", changes.Len())
 
 	// Fetch suggestions
+	fmt.Printf("::info::Requesting AI suggestions from %s (this may take a while for large PRs)...\n", openaiModel)
 	fmt.Printf("::debug::Requesting AI suggestions (model: %s, max_tokens: %d)...\n", openaiModel, maxTokens)
 	suggestions, err := fetchAiSuggestions(ctx, aiClient, changes.String(), openaiModel, maxTokens)
 	if err != nil {
