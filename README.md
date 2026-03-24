@@ -40,7 +40,7 @@ jobs:
           fetch-depth: 0
 
       - name: AI Pull Request Describer
-        uses: fajarhide/ai-pr-describer@v1.0.0 # Use the latest released version for best performance
+        uses: fajarhide/ai-pr-describer@v1.1.1 # Use the latest released version for best performance
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-api-base-url: 'https://api.github.com'
