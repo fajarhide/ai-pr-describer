@@ -32,5 +32,46 @@ inputs:
     required: false
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'composite'
+  steps:
+    - name: Determine Binary
+      id: binary
+      shell: bash
+      run: |
+        OS=$(echo "${{ runner.os }}" | tr '[:upper:]' '[:lower:]')
+        ARCH=$(echo "${{ runner.arch }}" | tr '[:upper:]' '[:lower:]')
+        
+        # Mapping GitHub runner arch to Go arch names if necessary (e.g. X64 to amd64)
+        if [ "$ARCH" == "x64" ]; then ARCH="amd64"; fi
+        if [ "$ARCH" == "arm64" ]; then ARCH="arm64"; fi
+        
+        echo "filename=ai-pr-describer-$OS-$ARCH" >> $GITHUB_OUTPUT
+
+    - name: Download Binary
+      shell: bash
+      run: |
+        VERSION=${{ github.action_ref || github.ref_name }}
+        if [ "$VERSION" == "main" ] || [ "$VERSION" == "master" ]; then
+          # Fallback to latest release if on main
+          URL=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest | grep "browser_download_url.*${{ steps.binary.outputs.filename }}" | cut -d '"' -f 4)
+        else
+          URL="https://github.com/${{ github.repository }}/releases/download/$VERSION/${{ steps.binary.outputs.filename }}"
+        fi
+        
+        echo "Downloading $URL"
+        curl -L -o /tmp/ai-pr-describer "$URL"
+        chmod +x /tmp/ai-pr-describer
+
+    - name: Run AI PR Describer
+      shell: bash
+      env:
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+        INPUT_GITHUB_API_BASE_URL: ${{ inputs.github-api-base-url }}
+        INPUT_OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+        INPUT_OPENAI_MODEL: ${{ inputs.openai-model }}
+        INPUT_OPENAI_BASE_URL: ${{ inputs.openai-base-url }}
+        INPUT_MAX_TOKENS: ${{ inputs.max-tokens }}
+        INPUT_MAX_CONTEXT_TOKENS: ${{ inputs.max-context-tokens }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GITHUB_EVENT_PATH: ${{ github.event_path }}
+      run: /tmp/ai-pr-describer

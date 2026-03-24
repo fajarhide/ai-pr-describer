@@ -1,1 +1,12 @@
 .DS_Store
+
+# Binaries
+ai-pr-describer
+dist/
+
+# IDEs
+.idea/
+.vscode/
+
+# OS files
+Thumbs.db

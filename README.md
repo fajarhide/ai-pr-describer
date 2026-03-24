@@ -8,10 +8,8 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 ![AI PR Describer Demo](media/ai-pr-describer.gif)
 
 ## Features
+- **High-Performance**: Uses pre-built binaries for near-instant startup (no Docker build overhead).
 - **Multi-Model Support**: Works with OpenAI, DeepSeek, Groq, or any OpenAI-compatible API.
-- **Auto-Update PR Body**: Automatically updates the PR description for a cleaner workflow.
-- **Customizable Prompt**: Generates categorized summaries (Refactor, Bug Fix, etc.).
-- **Go-Powered**: Fast, efficient, and lightweight container-based action.
 
 ## Requirements
 * API key from your chosen AI provider (OpenAI, DeepSeek, etc.).
@@ -42,7 +40,7 @@ jobs:
           fetch-depth: 0
 
       - name: AI Pull Request Describer
-        uses: fajarhide/ai-pr-describer@main
+        uses: fajarhide/ai-pr-describer@v1.0.0 # Use the latest released version for best performance
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-api-base-url: 'https://api.github.com'
@@ -92,12 +90,18 @@ openai-base-url: 'http://your-ollama-host:11434/v1'
 ## Configuration
 
 | `github-token`         | Yes      | The GitHub API token (`${{ secrets.GITHUB_TOKEN }}`).                         |
-| `openai-api-key`       | Yes      | The API key for your AI provider (e.g., OpenAI, DeepSeek).                                   |
-| `openai-model`         | No       | The AI model to use. Defaults to `gpt-3.5-turbo`.                        |
-| `openai-base-url`      | No       | Custom base URL for OpenAI-compatible APIs.                                |
-| `github-api-base-url`  | No       | The base URL for the GitHub API. Defaults to `https://api.github.com`.      |
-| `max-tokens`           | No       | The maximum number of tokens to generate in the PR description. Defaults to `2000`. |
-| `max-context-tokens`   | No       | The maximum number of tokens for the entire context (prompt + response). Defaults to `256000`. |
+| `openai-api-key`       | Yes      | The API key for your AI provider (e.g., OpenAI, DeepSeek).                    |
+| `openai-model`         | No       | The AI model to use. Defaults to `gpt-3.5-turbo`.                            |
+| `openai-base-url`      | No       | Custom base URL for OpenAI-compatible APIs.                                   |
+| `max-tokens`           | No       | The maximum length of the generated PR description. Defaults to `2000`.      |
+| `max-context-tokens`   | No       | The maximum tokens for the input diff + prompt. Defaults to `256000`.         |
+
+## 🚀 Performance
+
+This action is now a **Composite Action** using pre-built binaries. It typically runs in **under 15 seconds**, compared to ~2.5 minutes for Docker-based actions.
+
+> [!IMPORTANT]
+> To use this action in your own fork, you must first create a Release (e.g. `v1.0.0`) to trigger the build and upload of binaries.
 
 ## Troubleshooting 💡
 

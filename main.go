@@ -215,21 +215,60 @@ func fetchAiSuggestions(ctx context.Context, client *openai.Client, prChanges st
 }
 
 func generatePrompt(prChanges string) string {
-	return fmt.Sprintf(`I have a pull request with the following changes. Please provide a concise summary of these changes, categorized by type (e.g., Refactor, Bug Fix, Optimization, Feature).
+	return fmt.Sprintf(`You are an expert software engineer writing a high-quality pull request summary.
 
-### Changes Breakdown
-%[1]s
+Your goal is to produce a response that is BOTH:
+- Easy to quickly understand (for fast reviewers)
+- Fully detailed where it matters (for deep technical readers)
+
+IMPORTANT:
+- You have a LIMITED output budget.
+- Prioritize clarity and coverage of ALL important changes.
+- If necessary, compress less important details, but NEVER omit critical functionality changes.
 
 ---
-Structure your response as follows:
-[A high-level overview of the overall changes]
 
-### 📋 Detailed Changes
-1. **Type**: [Type]
-   **Description**: [Short, clear description of the change]
-2. **Type**: [Type]
-   **Description**: [Short, clear description of the change]
-...`, prChanges)
+### INPUT: Changes Breakdown
+%s
+
+---
+
+### OUTPUT FORMAT (STRICT)
+
+## 🚀 Summary
+(2–4 sentences, MAX ~400 characters)
+
+---
+
+## 🔑 Key Changes
+(Concise, grouped, MAX ~30%% of total output)
+
+---
+
+## 📋 Detailed Breakdown
+- Include ALL important technical changes
+- Prefer compact phrasing over long explanations
+- Merge closely related low-level changes when needed
+- Use dense but readable descriptions
+
+---
+
+## 🧠 Notes (Optional)
+Only if critical.
+
+---
+
+## ⚠️ Breaking Changes (If any)
+Only if these changes break existing functionality or APIs.
+
+---
+
+### STYLE GUIDELINES
+- Be concise but information-dense
+- Avoid redundancy between sections
+- Prioritize important changes over minor ones
+- Always highlight any BREAKING CHANGES in a dedicated sub-section if detected.
+`, prChanges)
 }
 
 func postComment(ctx context.Context, client *github.Client, owner, repo string, prNumber int, suggestions string) {
