@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/google/go-github/v60/github"
@@ -18,8 +19,24 @@ func main() {
 	openaiAPIKey := getEnv("INPUT_OPENAI_API_KEY", "INPUT_OPENAI-API-KEY", "OPENAI_API_KEY")
 	openaiModel := getEnv("INPUT_OPENAI_MODEL", "INPUT_OPENAI-MODEL", "OPENAI_MODEL")
 	openaiBaseURL := getEnv("INPUT_OPENAI_BASE_URL", "INPUT_OPENAI-BASE-URL", "OPENAI_BASE_URL")
+	maxTokensStr := getEnv("INPUT_MAX_TOKENS", "INPUT_MAX-TOKENS", "MAX_TOKENS")
+	maxContextTokensStr := getEnv("INPUT_MAX_CONTEXT_TOKENS", "INPUT_MAX-CONTEXT-TOKENS", "MAX_CONTEXT_TOKENS")
 	repoFullName := os.Getenv("GITHUB_REPOSITORY")
 	eventPath := os.Getenv("GITHUB_EVENT_PATH")
+
+	maxTokens := 2000
+	if maxTokensStr != "" {
+		if val, err := strconv.Atoi(maxTokensStr); err == nil {
+			maxTokens = val
+		}
+	}
+
+	maxContextTokens := 256000
+	if maxContextTokensStr != "" {
+		if val, err := strconv.Atoi(maxContextTokensStr); err == nil {
+			maxContextTokens = val
+		}
+	}
 
 	if openaiModel == "" {
 		openaiModel = openai.GPT3Dot5Turbo
@@ -105,12 +122,24 @@ func main() {
 	}
 
 	var changes strings.Builder
+	// Heuristic: 1 token ~= 4 characters. We reserve some tokens for the prompt and response.
+	maxChars := (maxContextTokens - maxTokens - 1000) * 4
+	if maxChars < 0 {
+		maxChars = 4000 // Fallback to a safe minimum
+	}
+
 	for _, file := range files {
-		changes.WriteString(fmt.Sprintf("File: %s\nChanges:\n%s\n", file.GetFilename(), file.GetPatch()))
+		patch := file.GetPatch()
+		fileDiff := fmt.Sprintf("File: %s\nChanges:\n%s\n", file.GetFilename(), patch)
+		if changes.Len()+len(fileDiff) > maxChars {
+			changes.WriteString(fmt.Sprintf("File: %s\nChanges:\n[Truncated due to context length limit]\n", file.GetFilename()))
+			break
+		}
+		changes.WriteString(fileDiff)
 	}
 
 	// Fetch suggestions
-	suggestions, err := fetchAiSuggestions(ctx, aiClient, changes.String(), openaiModel)
+	suggestions, err := fetchAiSuggestions(ctx, aiClient, changes.String(), openaiModel, maxTokens)
 	if err != nil {
 		fmt.Printf("::error::Error fetching AI suggestions: %v\n", err)
 		os.Exit(1)
@@ -153,7 +182,7 @@ func getPrNumber(eventPath string) (int, error) {
 	return event.PullRequest.Number, nil
 }
 
-func fetchAiSuggestions(ctx context.Context, client *openai.Client, prChanges string, model string) (string, error) {
+func fetchAiSuggestions(ctx context.Context, client *openai.Client, prChanges string, model string, maxTokens int) (string, error) {
 	prompt := generatePrompt(prChanges)
 
 	resp, err := client.CreateChatCompletion(
@@ -167,7 +196,7 @@ func fetchAiSuggestions(ctx context.Context, client *openai.Client, prChanges st
 				},
 			},
 			Temperature: 0.7,
-			MaxTokens:   300,
+			MaxTokens:   maxTokens,
 		},
 	)
 

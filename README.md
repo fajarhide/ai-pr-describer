@@ -26,7 +26,7 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 name: AI Pull Request Describer
 
 on:
-  pull_request_targed:
+  pull_request_target:
     types: [reopened, labeled]
 
 jobs:
@@ -47,8 +47,10 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-api-base-url: 'https://api.github.com'
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          openai-model: ${{ secrets.OPENAI_MODEL }}
-          openai-base-url: ${{ secrets.OPENAI_BASE_URL }}
+          openai-model: '${{ secrets.OPENAI_MODEL }}'
+          openai-base-url: '${{ secrets.OPENAI_BASE_URL }}'
+          max-tokens: 2000
+          max-context-tokens: 256000
 ```
 
 ## AI Provider Examples
@@ -72,6 +74,14 @@ openai-model: 'llama3-8b-8192'
 openai-base-url: 'https://api.groq.com/openai/v1'
 ```
 
+### GLM (Zhipu AI)
+```yaml
+openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+openai-model: 'glm-4'
+openai-base-url: 'https://open.bigmodel.cn/api/paas/v4'
+max-context-tokens: 128000 # adjust based on model capability
+```
+
 ### Ollama (Local/Self-hosted)
 ```yaml
 openai-api-key: 'ollama' # usually not required but cannot be empty
@@ -86,6 +96,8 @@ openai-base-url: 'http://your-ollama-host:11434/v1'
 | `openai-model`         | No       | The AI model to use. Defaults to `gpt-3.5-turbo`.                        |
 | `openai-base-url`      | No       | Custom base URL for OpenAI-compatible APIs.                                |
 | `github-api-base-url`  | No       | The base URL for the GitHub API. Defaults to `https://api.github.com`.      |
+| `max-tokens`           | No       | The maximum number of tokens to generate in the PR description. Defaults to `2000`. |
+| `max-context-tokens`   | No       | The maximum number of tokens for the entire context (prompt + response). Defaults to `256000`. |
 
 ## Troubleshooting 💡
 

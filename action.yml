@@ -22,6 +22,14 @@ inputs:
   openai-base-url:
     description: 'OpenAI API Base URL'
     required: false
+  max-tokens:
+    description: 'The maximum number of tokens to generate in the PR description'
+    default: '2000'
+    required: false
+  max-context-tokens:
+    description: 'The maximum number of tokens for the entire context (prompt + response)'
+    default: '256000'
+    required: false
 
 runs:
   using: 'docker'
