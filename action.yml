@@ -30,6 +30,10 @@ inputs:
     description: 'The maximum number of tokens for the entire context (prompt + response)'
     default: '32000'
     required: false
+  auto-update-enabled:
+    description: 'If enabled, PR descriptions will be automatically updated with each new commit, without the need for the `ai-describe` label.'
+    default: 'false'
+    required: false
 
 runs:
   using: 'composite'
@@ -79,6 +83,7 @@ runs:
         INPUT_OPENAI_BASE_URL: ${{ inputs.openai-base-url }}
         INPUT_MAX_TOKENS: ${{ inputs.max-tokens }}
         INPUT_MAX_CONTEXT_TOKENS: ${{ inputs.max-context-tokens }}
+        INPUT_AUTO_UPDATE_ENABLED: ${{ inputs.auto-update-enabled }}
         GITHUB_REPOSITORY: ${{ github.repository }}
         GITHUB_EVENT_PATH: ${{ github.event_path }}
       run: /tmp/ai-pr-describer

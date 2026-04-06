@@ -16,16 +16,20 @@ When you open or update a pull request labeled with **"ai-describe"**, this acti
 
 ## Usage
 
-* Add label "ai-describe" to your pull request
+### Option 1: Manual Label Mode (Default)
+Add the label `ai-describe` to any pull request to trigger generation.
 
-* Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
+### Option 2: Auto-Update Mode (Recommended)
+Enable `auto-update-enabled: true` to automatically generate and update the PR description **every time new commits are pushed**, no labels required. The description will always stay up to date with the latest changes.
+
+Add the following workflow file to your repository in `.github/workflows/ai-pr-describer.yml`:
 
 ```yaml
 name: AI Pull Request Describer
 
 on:
   pull_request_target:
-    types: [reopened, labeled]
+    types: [opened, synchronize, labeled, reopened]
 
 jobs:
   describe:
@@ -49,6 +53,7 @@ jobs:
           openai-base-url: '${{ secrets.OPENAI_BASE_URL }}'
           max-tokens: 2000
           max-context-tokens: 256000
+          auto-update-enabled: false
 ```
 
 ## AI Provider Examples
@@ -87,16 +92,44 @@ openai-model: 'llama3'
 openai-base-url: 'http://your-ollama-host:11434/v1'
 ```
 
+## How It Works
+
+```mermaid
+flowchart LR
+    A[PR Event Occurs] --> B{auto-update-enabled ?}
+    B -->|No| C{Has ai-describe label?}
+    B -->|Yes| D[✅ Run Automatically]
+    
+    C -->|No| E[Skip / Do Nothing]
+    C -->|Yes| D
+    
+    D --> F[Fetch full PR diff]
+    F --> G[AI generates complete description]
+    G --> H[Update PR body]
+    
+    style D fill:#0ea5e9,color:white
+    style H fill:#10b981,color:white
+```
+
+Supported events:
+- `opened` - when PR is first created
+- `synchronize` - **every time new commits are pushed**
+- `labeled` - when `ai-describe` label is added
+- `reopened` - when PR is reopened
+
 ## Configuration
 
-| `github-token`         | Yes      | The GitHub API token (`${{ secrets.GITHUB_TOKEN }}`).                         |
-| `openai-api-key`       | Yes      | The API key for your AI provider (e.g., OpenAI, DeepSeek).                    |
-| `openai-model`         | No       | The AI model to use. Defaults to `gpt-3.5-turbo`.                            |
-| `openai-base-url`      | No       | Custom base URL for OpenAI-compatible APIs.                                   |
-| `max-tokens`           | No       | The maximum length of the generated PR description. Defaults to `2000`.      |
-| `max-context-tokens`   | No       | The maximum tokens for the input diff + prompt. Defaults to `32000`.          |
+| Name                   | Required | Description                                                                 | Default             |
+|------------------------|----------|-----------------------------------------------------------------------------|---------------------|
+| `github-token`         | ✅ Yes    | GitHub API token, use `${{ secrets.GITHUB_TOKEN }}`                         |                     |
+| `openai-api-key`       | ✅ Yes    | API Key for your AI provider (OpenAI, DeepSeek, Groq, etc.)                 |                     |
+| `openai-model`         | ❌ No     | AI model to use                                                             | `gpt-3.5-turbo`     |
+| `openai-base-url`      | ❌ No     | Custom base URL for OpenAI-compatible APIs                                  |                     |
+| `max-tokens`           | ❌ No     | Maximum output tokens for generated description                             | `2000`              |
+| `max-context-tokens`   | ❌ No     | Maximum total context tokens (input diff + prompt + output)                 | `32000`             |
+| `auto-update-enabled`  | ❌ No     | Auto update PR description on every new commit. No labels required.         | `false`             |
 
-## 🚀 Performance
+## Performance
 
 This action is now a **Composite Action** using pre-built binaries. It typically runs in **under 15 seconds**, compared to ~2.5 minutes for Docker-based actions.
 
