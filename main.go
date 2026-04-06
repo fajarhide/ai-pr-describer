@@ -22,6 +22,7 @@ func main() {
 	openaiBaseURL := getEnv("INPUT_OPENAI_BASE_URL", "INPUT_OPENAI-BASE-URL", "OPENAI_BASE_URL")
 	maxTokensStr := getEnv("INPUT_MAX_TOKENS", "INPUT_MAX-TOKENS", "MAX_TOKENS")
 	maxContextTokensStr := getEnv("INPUT_MAX_CONTEXT_TOKENS", "INPUT_MAX-CONTEXT-TOKENS", "MAX_CONTEXT_TOKENS")
+	autoUpdateEnabledStr := getEnv("INPUT_AUTO_UPDATE_ENABLED", "INPUT_AUTO-UPDATE-ENABLED")
 	repoFullName := os.Getenv("GITHUB_REPOSITORY")
 	eventPath := os.Getenv("GITHUB_EVENT_PATH")
 
@@ -37,6 +38,11 @@ func main() {
 		if val, err := strconv.Atoi(maxContextTokensStr); err == nil {
 			maxContextTokens = val
 		}
+	}
+
+	autoUpdateEnabled := false
+	if autoUpdateEnabledStr == "true" || autoUpdateEnabledStr == "1" {
+		autoUpdateEnabled = true
 	}
 
 	if openaiModel == "" {
@@ -114,9 +120,19 @@ func main() {
 		}
 	}
 
-	if !hasLabel {
-		fmt.Println("::info::Label 'ai-describe' not found. Skipping.")
+	shouldRun := autoUpdateEnabled || hasLabel
+
+	if !shouldRun {
+		if autoUpdateEnabled {
+			fmt.Println("::debug::Auto update active mode, but if the conditions are met")
+		} else {
+			fmt.Println("::info::Label 'ai-describe' not found. Skipping.")
+		}
 		return
+	}
+
+	if autoUpdateEnabled {
+		fmt.Println("::debug::Auto update active mode, skip lable checking.")
 	}
 
 	// Fetch changes
@@ -238,17 +254,17 @@ IMPORTANT:
 
 ### OUTPUT FORMAT (STRICT)
 
-## 🚀 Summary
+## Summary
 (2–4 sentences, MAX ~400 characters)
 
 ---
 
-## 🔑 Key Changes
+## Key Changes
 (Concise, grouped, MAX ~30%% of total output)
 
 ---
 
-## 📋 Detailed Breakdown
+## Detailed Breakdown
 - Include ALL important technical changes
 - Prefer compact phrasing over long explanations
 - Merge closely related low-level changes when needed
@@ -256,12 +272,12 @@ IMPORTANT:
 
 ---
 
-## 🧠 Notes (Optional)
+## Notes (Optional)
 Only if critical.
 
 ---
 
-## ⚠️ Breaking Changes (If any)
+## Breaking Changes (If any)
 Only if these changes break existing functionality or APIs.
 
 ---
