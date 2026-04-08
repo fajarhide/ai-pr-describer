@@ -172,7 +172,7 @@ func main() {
 	}
 
 	// Update PR Body
-	newBody := fmt.Sprintf("%s\n\n## PR Auto Describe\n%s", pr.GetBody(), suggestions)
+	newBody := updatePrBody(pr.GetBody(), suggestions)
 	_, _, err = ghClient.PullRequests.Edit(ctx, owner, repo, prNumber, &github.PullRequest{
 		Body: github.String(newBody),
 	})
@@ -309,4 +309,28 @@ func getEnv(keys ...string) string {
 		}
 	}
 	return ""
+}
+
+const (
+	startMarker = "<!-- AI-PR-DESCRIPTION-START -->"
+	endMarker   = "<!-- AI-PR-DESCRIPTION-END -->"
+)
+
+func updatePrBody(oldBody, newContent string) string {
+	startID := strings.Index(oldBody, startMarker)
+	endID := strings.Index(oldBody, endMarker)
+
+	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	aiSection := fmt.Sprintf("%s\n## PR Auto Describe\n%s\n\n_Last updated: %s_\n%s", startMarker, newContent, timestamp, endMarker)
+
+	if startID != -1 && endID != -1 && startID < endID {
+		// Replace existing section
+		return oldBody[:startID] + aiSection + oldBody[endID+len(endMarker):]
+	}
+
+	// Append new section
+	if oldBody == "" {
+		return aiSection
+	}
+	return strings.TrimSpace(oldBody) + "\n\n" + aiSection
 }
